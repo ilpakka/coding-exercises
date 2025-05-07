@@ -122,7 +122,7 @@ class Muistipeli {
                 const img = new Image();
                 img.onload = resolve;
                 img.onerror = reject;
-                img.src = `assets/card${arvo}.png`;
+                img.src = `images/kortti${arvo}.png`;
             })
         );
 
@@ -143,7 +143,7 @@ class Muistipeli {
             
             const kortinEtupuoli = document.createElement('div');
             kortinEtupuoli.className = 'kortin-etupuoli';
-            kortinEtupuoli.innerHTML = `<img src="assets/card${arvo}.png" alt="Kortti ${arvo}" loading="lazy">`;
+            kortinEtupuoli.innerHTML = `<img src="images/kortti${arvo}.png" alt="Kortti ${arvo}" loading="lazy">`;
             
             const kortinTakapuoli = document.createElement('div');
             kortinTakapuoli.className = 'kortin-takapuoli';
