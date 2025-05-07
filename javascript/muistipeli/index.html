@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Moderni muistipeli">
+    <meta name="author" content="Ilja Ylikangas, Tommi Saranpää, Erno Koljonen">
+    <title>Muistipeli</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<!--
+ # 1.versio (17.4.2025 luento):
+ # Yksinkertainen käyttöliittymä, jossa pelaajalla on 8 korttia, joista paljastuu 
+ # 4 erilaista paria (pallo, kolmio, tähti sekä timantti).
+ # 
+ # Pelaaja avaa kortit klikkaamalla niitä. Kun kaksi korttia on avattu niin tarkistetaan
+ # ovatko ne samaa paria. Jos ovat, niin kortit poistuvat pelistä. Muussa tapauksessa kortit
+ # palautuvat oletustilaan ja peli jatkuu.
+ # -------------------------------
+ # 2. versio (7.5.2025 kotona):
+ # Pelin pohja luotu, kortit ei vielä toimi.
+ # -------------------------------
+ # 3. versio (7.5.2025 kotona):
+ # Peli toimii. Jee!
+ # -------------------------------
+ -->
+ 
+<script>
+    // Muuttujat
+    let kortit = document.querySelectorAll(".kortti");
+    let kortitArvot = ["pallo", "kolmio", "tähti", "timantti", "pallo", "kolmio", "tähti", "timantti"];
+    let kortitAuki = [];
+    let kortitOikein = 0;
+    let kortitValmiina = false;
+
+    // Sekoitus
+    function sekoitaKortit() {
+        kortitArvot.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < kortit.length; i++) {
+            kortit[i].setAttribute("data-arvo", kortitArvot[i]);
+            kortit[i].addEventListener("click", avaaKortti);
+        }
+    }
+
+    // Kortin avaaminen
+    function avaaKortti() {
+        if (kortitValmiina) return;
+        this.classList.add("avattu");
+        this.innerHTML = `<img src="${this.getAttribute("data-arvo")}.png" alt="${this.getAttribute("data-arvo")}">`;
+        kortitAuki.push(this);
+
+        if (kortitAuki.length === 2) {
+            tarkistaPari();
+        }
+    }
+
+    // Parin tarkistus
+    function tarkistaPari() {
+        kortitValmiina = true;
+        setTimeout(() => {
+            if (kortitAuki[0].getAttribute("data-arvo") === kortitAuki[1].getAttribute("data-arvo")) {
+                kortitOikein += 2;
+                kortitAuki[0].removeEventListener("click", avaaKortti);
+                kortitAuki[1].removeEventListener("click", avaaKortti);
+            } else {
+                kortitAuki[0].classList.remove("avattu");
+                kortitAuki[1].classList.remove("avattu");
+                kortitAuki[0].innerHTML = "";
+                kortitAuki[1].innerHTML = "";
+            }
+            kortitAuki = [];
+            kortitsValmiina = false;
+
+            if (kortitsOikein === 8) {
+                alert("Voitto! Kaikki parit löytyivät!");
+            }
+        },)
+    }
+</script>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Muistipeli</h1>
+            <div class="peli-tiedot">
+                <div class="pisteet">Pisteet: <span id="score">0</span></div>
+                <div class="siirrot">Siirtoja: <span id="moves">0</span></div>
+            </div>
+        </header>
+
+        <main>
+            <div class="peli-ohjaimet">
+                <button id="newGameBtn">Uusi peli</button>
+                <select id="difficulty">
+                    <option value="helppo">Helppo (12 korttia)</option>
+                    <option value="keskitaso">Keskitaso (16 korttia)</option>
+                    <option value="vaikea">Vaikea (24 korttia)</option>
+                </select>
+            </div>
+
+            <div id="gameBoard" class="pelilauta">
+                <!-- Korttien generointi -->
+            </div>
+        </main>
+
+        <div id="gameOver" class="peli-loppu piilotettu">
+            <div class="peli-loppu-sisalto">
+                <h2>Peli päättyi!</h2>
+                <p>Pisteet: <span id="finalScore">0</span></p>
+                <p>Siirtoja: <span id="finalMoves">0</span></p>
+                <button id="playAgainBtn">Pelaa uudelleen</button>
+            </div>
+        </div>
+    </div>
+    <script src="scripts/script.js"></script>
+</body>
+
+</html>
