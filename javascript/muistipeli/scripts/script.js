@@ -4,25 +4,43 @@ class Muistipeli {
         this.kaannetytKortit = [];
         this.loydettyParit = 0;
         this.siirrot = 0;
-        this.pisteet = 0;
         this.lukittu = false;
         this.vaikeustaso = 'helppo';
+        this.peliMoodi = 'single';
+        this.nykyinenPelaaja = 1;
+        this.pelaajaPisteet = [0, 0];
+        this.pelaajaNimet = ['Pelaaja 1', 'Pelaaja 2'];
         
         // DOM elementit
+        this.pelaajaAsetukset = document.getElementById('playerSetup');
+        this.peliNaytto = document.getElementById('gameScreen');
         this.pelilauta = document.getElementById('gameBoard');
-        this.pisteetElementti = document.getElementById('score');
+        this.pelaaja1Nimi = document.getElementById('player1Name');
+        this.pelaaja2Nimi = document.getElementById('player2Name');
+        this.pelaaja1Naytto = document.getElementById('player1NameDisplay');
+        this.pelaaja2Naytto = document.getElementById('player2NameDisplay');
+        this.pelaaja1Pisteet = document.getElementById('player1Score');
+        this.pelaaja2Pisteet = document.getElementById('player2Score');
+        this.nykyinenPelaajaNaytto = document.querySelector('#currentPlayer span');
+        this.pelaaja1Info = document.getElementById('player1Info');
+        this.pelaaja2Info = document.getElementById('player2Info');
         this.siirrotElementti = document.getElementById('moves');
         this.uusiPeliNappi = document.getElementById('newGameBtn');
         this.vaikeustasoValinta = document.getElementById('difficulty');
         this.peliLoppuRuutu = document.getElementById('gameOver');
-        this.lopullisetPisteetElementti = document.getElementById('finalScore');
+        this.voittajaInfo = document.getElementById('winnerInfo');
+        this.pelaaja1NimiFinal = document.getElementById('player1NameFinal');
+        this.pelaaja2NimiFinal = document.getElementById('player2NameFinal');
+        this.pelaaja1PisteetFinal = document.getElementById('player1ScoreFinal');
+        this.pelaaja2PisteetFinal = document.getElementById('player2ScoreFinal');
         this.lopullisetSiirrotElementti = document.getElementById('finalMoves');
         this.pelaaUudelleenNappi = document.getElementById('playAgainBtn');
+        this.aloitaPeliNappi = document.getElementById('startGameBtn');
 
         // Tarkista DOM elementit
-        if (!this.pelilauta || !this.pisteetElementti || !this.siirrotElementti || 
+        if (!this.pelilauta || !this.pelaaja1Nimi || !this.pelaaja2Nimi || 
             !this.uusiPeliNappi || !this.vaikeustasoValinta || !this.peliLoppuRuutu || 
-            !this.lopullisetPisteetElementti || !this.lopullisetSiirrotElementti || !this.pelaaUudelleenNappi) {
+            !this.aloitaPeliNappi) {
             throw new Error('Vaaditut DOM elementit puuttuvat');
         }
 
@@ -30,16 +48,59 @@ class Muistipeli {
         this.sidottuAloitaUusiPeli = this.aloitaUusiPeli.bind(this);
         this.sidottuKäsitteleVaikeustasonMuutos = this.käsitteleVaikeustasonMuutos.bind(this);
         this.sidottuKäsittelePelaaUudelleen = this.käsittelePelaaUudelleen.bind(this);
+        this.sidottuAloitaPeli = this.aloitaPeli.bind(this);
         
+        this.aloitaPeliNappi.addEventListener('click', this.sidottuAloitaPeli);
         this.uusiPeliNappi.addEventListener('click', this.sidottuAloitaUusiPeli);
         this.vaikeustasoValinta.addEventListener('change', this.sidottuKäsitteleVaikeustasonMuutos);
         this.pelaaUudelleenNappi.addEventListener('click', this.sidottuKäsittelePelaaUudelleen);
 
         // Näppäimistönavigointi
         this.pelilauta.addEventListener('keydown', this.käsitteleNäppäimistönavigointi.bind(this));
+    }
 
-        // Pelin aloitus
+    aloitaPeli() {
+        // Hae pelaajien nimet
+        this.pelaajaNimet[0] = this.pelaaja1Nimi.value || 'Pelaaja 1';
+        this.pelaajaNimet[1] = this.pelaaja2Nimi.value || 'Pelaaja 2';
+        
+        // Päivitä näytöllä olevat nimet
+        this.pelaaja1Naytto.textContent = this.pelaajaNimet[0];
+        this.pelaaja2Naytto.textContent = this.pelaajaNimet[1];
+        this.pelaaja1NimiFinal.textContent = this.pelaajaNimet[0];
+        this.pelaaja2NimiFinal.textContent = this.pelaajaNimet[1];
+
+        // Tarkista pelimoodi
+        this.peliMoodi = document.querySelector('input[name="gameMode"]:checked').value;
+        
+        // Näytä/piilota toisen pelaajan tiedot
+        const player2Elements = document.querySelectorAll('#player2NameDisplay, #player2Score');
+        const erotin = document.querySelector('.pelaaja-erotin');
+        if (this.peliMoodi === 'multi') {
+            player2Elements.forEach(el => el.classList.remove('piilotettu'));
+            erotin.classList.remove('piilotettu');
+        } else {
+            player2Elements.forEach(el => el.classList.add('piilotettu'));
+            erotin.classList.add('piilotettu');
+        }
+
+        // Siirry pelinäkymään
+        this.pelaajaAsetukset.classList.add('piilotettu');
+        this.peliNaytto.classList.remove('piilotettu');
+
+        // Aloita peli
         this.aloitaUusiPeli();
+    }
+
+    päivitäNykyinenPelaaja() {
+        this.nykyinenPelaaja = this.nykyinenPelaaja === 1 ? 2 : 1;
+        this.nykyinenPelaajaNaytto.textContent = this.pelaajaNimet[this.nykyinenPelaaja - 1];
+        
+        // Päivitä aktiivinen pelaaja
+        const player1Name = document.getElementById('player1NameDisplay');
+        const player2Name = document.getElementById('player2NameDisplay');
+        player1Name.classList.toggle('active', this.nykyinenPelaaja === 1);
+        player2Name.classList.toggle('active', this.nykyinenPelaaja === 2);
     }
 
     käsitteleVaikeustasonMuutos(e) {
@@ -182,46 +243,57 @@ class Muistipeli {
         const pari = kortti1.dataset.value === kortti2.dataset.value;
 
         if (pari) {
-            this.käsittelePari();
+            this.pelaajaPisteet[this.nykyinenPelaaja - 1] += 10;
+            this.pelaaja1Pisteet.textContent = this.pelaajaPisteet[0];
+            this.pelaaja2Pisteet.textContent = this.pelaajaPisteet[1];
+            this.loydettyParit++;
+
+            this.kaannetytKortit.forEach(kortti => {
+                kortti.classList.add('loydetty');
+                kortti.setAttribute('aria-label', 'Löydetty pari');
+            });
+
+            setTimeout(() => {
+                this.kaannetytKortit = [];
+                this.lukittu = false;
+
+                if (this.loydettyParit === this.haeVaikeustasonAsetukset().parit) {
+                    this.lopetaPeli();
+                }
+            }, 800);
         } else {
-            this.käsitteleEriPari();
+            setTimeout(() => {
+                this.kaannetytKortit.forEach(kortti => {
+                    kortti.classList.remove('kaannetty');
+                });
+                this.kaannetytKortit = [];
+                this.lukittu = false;
+                
+                if (this.peliMoodi === 'multi') {
+                    this.päivitäNykyinenPelaaja();
+                }
+            }, 1000);
         }
     }
 
-    käsittelePari() {
-        this.pisteet += 10;
-        this.pisteetElementti.textContent = this.pisteet;
-        this.loydettyParit++;
-
-        this.kaannetytKortit.forEach(kortti => {
-            kortti.classList.add('loydetty');
-            kortti.setAttribute('aria-label', 'Löydetty pari');
-        });
-
-        // Odota animaation loppumista ennen korttien poistamista
-        setTimeout(() => {
-            this.kaannetytKortit = [];
-            this.lukittu = false;
-
-            if (this.loydettyParit === this.haeVaikeustasonAsetukset().parit) {
-                this.lopetaPeli();
-            }
-        }, 800); // 800ms vastaa animaation kestoa
-    }
-
-    käsitteleEriPari() {
-        setTimeout(() => {
-            this.kaannetytKortit.forEach(kortti => {
-                kortti.classList.remove('kaannetty');
-            });
-            this.kaannetytKortit = [];
-            this.lukittu = false;
-        }, 1000);
-    }
-
     lopetaPeli() {
-        this.lopullisetPisteetElementti.textContent = this.pisteet;
+        this.pelaaja1PisteetFinal.textContent = this.pelaajaPisteet[0];
+        this.pelaaja2PisteetFinal.textContent = this.pelaajaPisteet[1];
         this.lopullisetSiirrotElementti.textContent = this.siirrot;
+
+        // Määritä voittaja
+        if (this.peliMoodi === 'multi') {
+            if (this.pelaajaPisteet[0] > this.pelaajaPisteet[1]) {
+                this.voittajaInfo.textContent = `${this.pelaajaNimet[0]} voitti!`;
+            } else if (this.pelaajaPisteet[1] > this.pelaajaPisteet[0]) {
+                this.voittajaInfo.textContent = `${this.pelaajaNimet[1]} voitti!`;
+            } else {
+                this.voittajaInfo.textContent = 'Tasapeli!';
+            }
+        } else {
+            this.voittajaInfo.textContent = 'Onnittelut! Kaikki parit löydetty!';
+        }
+
         this.peliLoppuRuutu.classList.remove('piilotettu');
         this.peliLoppuRuutu.setAttribute('aria-live', 'polite');
 
@@ -243,14 +315,12 @@ class Muistipeli {
 
             const particleCount = 50 * (timeLeft / duration);
             
-            // Confetti from left
             confetti({
                 ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
             });
             
-            // Confetti from right
             confetti({
                 ...defaults,
                 particleCount,
@@ -269,11 +339,21 @@ class Muistipeli {
         this.kaannetytKortit = [];
         this.loydettyParit = 0;
         this.siirrot = 0;
-        this.pisteet = 0;
         this.lukittu = false;
+        this.nykyinenPelaaja = 1;
+        this.pelaajaPisteet = [0, 0];
 
-        this.pisteetElementti.textContent = this.pisteet;
-        this.siirrotElementti.textContent = this.siirrot;
+        this.pelaaja1Pisteet.textContent = '0';
+        this.pelaaja2Pisteet.textContent = '0';
+        this.siirrotElementti.textContent = '0';
+        this.nykyinenPelaajaNaytto.textContent = this.pelaajaNimet[0];
+        
+        // Päivitä aktiivinen pelaaja
+        const player1Name = document.getElementById('player1NameDisplay');
+        const player2Name = document.getElementById('player2NameDisplay');
+        player1Name.classList.add('active');
+        player2Name.classList.remove('active');
+        
         this.peliLoppuRuutu.classList.add('piilotettu');
 
         await this.luoKortit();

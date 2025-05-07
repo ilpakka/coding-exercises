@@ -27,93 +27,75 @@
  # -------------------------------
  -->
  
-<script>
-    // Muuttujat
-    let kortit = document.querySelectorAll(".kortti");
-    let kortitArvot = ["pallo", "kolmio", "tähti", "timantti", "pallo", "kolmio", "tähti", "timantti"];
-    let kortitAuki = [];
-    let kortitOikein = 0;
-    let kortitValmiina = false;
-
-    // Sekoitus
-    function sekoitaKortit() {
-        kortitArvot.sort(() => Math.random() - 0.5);
-        for (let i = 0; i < kortit.length; i++) {
-            kortit[i].setAttribute("data-arvo", kortitArvot[i]);
-            kortit[i].addEventListener("click", avaaKortti);
-        }
-    }
-
-    // Kortin avaaminen
-    function avaaKortti() {
-        if (kortitValmiina) return;
-        this.classList.add("avattu");
-        this.innerHTML = `<img src="${this.getAttribute("data-arvo")}.png" alt="${this.getAttribute("data-arvo")}">`;
-        kortitAuki.push(this);
-
-        if (kortitAuki.length === 2) {
-            tarkistaPari();
-        }
-    }
-
-    // Parin tarkistus
-    function tarkistaPari() {
-        kortitValmiina = true;
-        setTimeout(() => {
-            if (kortitAuki[0].getAttribute("data-arvo") === kortitAuki[1].getAttribute("data-arvo")) {
-                kortitOikein += 2;
-                kortitAuki[0].removeEventListener("click", avaaKortti);
-                kortitAuki[1].removeEventListener("click", avaaKortti);
-            } else {
-                kortitAuki[0].classList.remove("avattu");
-                kortitAuki[1].classList.remove("avattu");
-                kortitAuki[0].innerHTML = "";
-                kortitAuki[1].innerHTML = "";
-            }
-            kortitAuki = [];
-            kortitValmiina = false;
-
-            if (kortitsOikein === 8) {
-                alert("Voitto! Kaikki parit löytyivät!");
-            }
-        },)
-    }
-</script>
-
 <body>
     <div class="container">
-        <header>
-            <h1>Muistipeli</h1>
-            <div class="peli-tiedot">
-                <div class="pisteet">Pisteet: <span id="score">0</span></div>
-                <div class="siirrot">Siirtoja: <span id="moves">0</span></div>
+        <!-- Pelaajien asetukset -->
+        <div id="playerSetup" class="pelaaja-asetukset">
+            <h2>Pelaajien asetukset</h2>
+            <div class="pelaaja-input">
+                <label for="player1Name">Pelaaja 1:</label>
+                <input type="text" id="player1Name" placeholder="Pelaaja 1" value="Pelaaja 1">
             </div>
-        </header>
-
-        <main>
-            <div class="peli-ohjaimet">
-                <button id="newGameBtn">Uusi peli</button>
-                <select id="difficulty">
-                    <option value="helppo">Helppo (12 korttia)</option>
-                    <option value="keskitaso">Keskitaso (16 korttia)</option>
-                    <option value="vaikea">Vaikea (24 korttia)</option>
-                </select>
+            <div class="pelaaja-input">
+                <label for="player2Name">Pelaaja 2:</label>
+                <input type="text" id="player2Name" placeholder="Pelaaja 2" value="Pelaaja 2">
             </div>
-
-            <div id="gameBoard" class="pelilauta">
-                <!-- Korttien generointi -->
+            <div class="peli-moodi">
+                <label>
+                    <input type="radio" name="gameMode" value="single" checked> Yksinpeli
+                </label>
+                <label>
+                    <input type="radio" name="gameMode" value="multi"> Kaksinpeli
+                </label>
             </div>
-        </main>
+            <button id="startGameBtn">Aloita peli</button>
+        </div>
 
-        <div id="gameOver" class="peli-loppu piilotettu">
-            <div class="peli-loppu-sisalto">
-                <h2>Peli päättyi!</h2>
-                <p>Pisteet: <span id="finalScore">0</span></p>
-                <p>Siirtoja: <span id="finalMoves">0</span></p>
-                <button id="playAgainBtn">Pelaa uudelleen</button>
+        <!-- Peli -->
+        <div id="gameScreen" class="piilotettu">
+            <header>
+                <h1>Muistipeli</h1>
+                <div class="peli-tiedot">
+                    <div class="pisteet">
+                        <span id="player1NameDisplay">Pelaaja 1</span>: <span id="player1Score">0</span>
+                        <span class="pelaaja-erotin">|</span>
+                        <span id="player2NameDisplay">Pelaaja 2</span>: <span id="player2Score">0</span>
+                    </div>
+                    <div class="siirrot">Siirtoja: <span id="moves">0</span></div>
+                    <div id="currentPlayer" class="nykyinen-pelaaja">Vuoro: <span>Pelaaja 1</span></div>
+                </div>
+            </header>
+
+            <main>
+                <div class="peli-ohjaimet">
+                    <button id="newGameBtn">Uusi peli</button>
+                    <select id="difficulty">
+                        <option value="helppo">Helppo (12 korttia)</option>
+                        <option value="keskitaso">Keskitaso (16 korttia)</option>
+                        <option value="vaikea">Vaikea (24 korttia)</option>
+                    </select>
+                </div>
+
+                <div id="gameBoard" class="pelilauta">
+                    <!-- Korttien generointi -->
+                </div>
+            </main>
+
+            <div id="gameOver" class="peli-loppu piilotettu">
+                <div class="peli-loppu-sisalto">
+                    <h2>Peli päättyi!</h2>
+                    <div id="winnerInfo"></div>
+                    <p>Pisteet:</p>
+                    <p><span id="player1NameFinal">Pelaaja 1</span>: <span id="player1ScoreFinal">0</span></p>
+                    <p id="player2ScoreFinal" class="piilotettu"><span id="player2NameFinal">Pelaaja 2</span>: <span>0</span></p>
+                    <p>Siirtoja: <span id="finalMoves">0</span></p>
+                    <button id="playAgainBtn">Pelaa uudelleen</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="scripts/script.js"></script>
 </body>

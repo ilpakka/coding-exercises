@@ -40,10 +40,23 @@ h1 {
 
 .peli-tiedot {
     display: flex;
-    justify-content: center;
-    gap: 2rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 1.2rem;
     margin-bottom: 1rem;
+}
+
+.pisteet {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.3rem;
+}
+
+.pelaaja-erotin {
+    color: var(--secondary-color);
+    font-weight: bold;
 }
 
 .peli-ohjaimet {
@@ -220,4 +233,75 @@ select {
         flex-direction: column;
         gap: 0.5rem;
     }
+}
+
+.pelaaja-asetukset {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.pelaaja-input {
+    margin: 1rem 0;
+    text-align: left;
+}
+
+.pelaaja-input label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.pelaaja-input input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.peli-moodi {
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.peli-moodi label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.nykyinen-pelaaja {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.pisteet span.active {
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.pelaaja-tiedot {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+}
+
+.pelaaja-tiedot.active {
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+#winnerInfo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--success-color);
+    margin: 1rem 0;
 } 
