@@ -24,7 +24,7 @@ body {
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 header {
@@ -80,8 +80,8 @@ select {
 .pelilauta {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0.2rem;
-    max-width: 1000px;
+    gap: 0.5rem;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0.5rem;
     grid-auto-rows: min-content;
@@ -92,7 +92,7 @@ select {
     background-color: var(--card-back);
     border-radius: 6px;
     cursor: pointer;
-    transition: transform 0.6s;
+    transition: transform 0.6s, box-shadow 0.3s;
     transform-style: preserve-3d;
     position: relative;
     width: 100%;
@@ -101,6 +101,11 @@ select {
 
 .kortti.kaannetty {
     transform: rotateY(180deg);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.kortti.kaannetty:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
 .kortin-etupuoli, .kortin-takapuoli {
@@ -130,7 +135,24 @@ select {
 }
 
 .kortti.loydetty {
-    visibility: hidden;
+    animation: matchSuccess 0.8s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes matchSuccess {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px 10px rgba(46, 204, 113, 0.4);
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+        visibility: hidden;
+    }
 }
 
 .peli-loppu {
@@ -159,34 +181,39 @@ select {
 
 /* Vaikeustason muutokset */
 .pelilauta[data-vaikeustaso="helppo"] {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    max-width: 800px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    max-width: 1200px;
 }
 
 .pelilauta[data-vaikeustaso="keskitaso"] {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    max-width: 1400px;
 }
 
 .pelilauta[data-vaikeustaso="vaikea"] {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    max-width: 1400px;
 }
 
 /* Responsiivisuus */
 @media (max-width: 1200px) {
     .pelilauta {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.4rem;
     }
 }
 
 @media (max-width: 768px) {
     .pelilauta {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.3rem;
     }
 }
 
 @media (max-width: 480px) {
     .pelilauta {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.2rem;
     }
     
     .peli-tiedot {

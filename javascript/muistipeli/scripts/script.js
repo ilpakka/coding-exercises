@@ -6,7 +6,7 @@ class Muistipeli {
         this.siirrot = 0;
         this.pisteet = 0;
         this.lukittu = false;
-        this.vaikeustaso = 'keskitaso';
+        this.vaikeustaso = 'helppo';
         
         // DOM elementit
         this.pelilauta = document.getElementById('gameBoard');
@@ -90,9 +90,9 @@ class Muistipeli {
 
     haeVaikeustasonAsetukset() {
         const asetukset = {
-            helppo: { parit: 6, sarakkeet: 4 },
-            keskitaso: { parit: 8, sarakkeet: 4 },
-            vaikea: { parit: 12, sarakkeet: 6 }
+            helppo: { parit: 6, sarakkeet: 6 },
+            keskitaso: { parit: 8, sarakkeet: 8 },
+            vaikea: { parit: 12, sarakkeet: 8 }
         };
         return asetukset[this.vaikeustaso];
     }
@@ -122,7 +122,7 @@ class Muistipeli {
                 const img = new Image();
                 img.onload = resolve;
                 img.onerror = reject;
-                img.src = `images/kortti${arvo}.png`;
+                img.src = `images/kortti${arvo}.jpeg`;
             })
         );
 
@@ -143,7 +143,7 @@ class Muistipeli {
             
             const kortinEtupuoli = document.createElement('div');
             kortinEtupuoli.className = 'kortin-etupuoli';
-            kortinEtupuoli.innerHTML = `<img src="images/kortti${arvo}.png" alt="Kortti ${arvo}" loading="lazy">`;
+            kortinEtupuoli.innerHTML = `<img src="images/kortti${arvo}.jpeg" alt="Kortti ${arvo}" loading="lazy">`;
             
             const kortinTakapuoli = document.createElement('div');
             kortinTakapuoli.className = 'kortin-takapuoli';
@@ -198,12 +198,15 @@ class Muistipeli {
             kortti.setAttribute('aria-label', 'Löydetty pari');
         });
 
-        this.kaannetytKortit = [];
-        this.lukittu = false;
+        // Odota animaation loppumista ennen korttien poistamista
+        setTimeout(() => {
+            this.kaannetytKortit = [];
+            this.lukittu = false;
 
-        if (this.loydettyParit === this.haeVaikeustasonAsetukset().parit) {
-            this.lopetaPeli();
-        }
+            if (this.loydettyParit === this.haeVaikeustasonAsetukset().parit) {
+                this.lopetaPeli();
+            }
+        }, 800); // 800ms vastaa animaation kestoa
     }
 
     käsitteleEriPari() {
@@ -221,6 +224,39 @@ class Muistipeli {
         this.lopullisetSiirrotElementti.textContent = this.siirrot;
         this.peliLoppuRuutu.classList.remove('piilotettu');
         this.peliLoppuRuutu.setAttribute('aria-live', 'polite');
+
+        // Confetti effect
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+            
+            // Confetti from left
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+            });
+            
+            // Confetti from right
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+            });
+        }, 250);
     }
 
     async aloitaUusiPeli() {
